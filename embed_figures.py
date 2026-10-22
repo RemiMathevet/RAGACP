@@ -24,8 +24,20 @@ CHARGEURS = {"uni2": em.load_uni2}
 MEAN, STD = torch.tensor(em.IMAGENET_MEAN).view(3, 1, 1), torch.tensor(em.IMAGENET_STD).view(3, 1, 1)
 
 
+def ouvrir(p):
+    """Pillow lit mal une partie des JPEG 2000 sortis des PDF (13 % du corpus, 22/10) : repli MuPDF, qui les décode."""
+    try:
+        return Image.open(p).convert("RGB")
+    except Exception:
+        import fitz
+        px = fitz.Pixmap(str(p))
+        if px.n - px.alpha != 3:
+            px = fitz.Pixmap(fitz.csRGB, px)
+        return Image.frombytes("RGBA" if px.alpha else "RGB", (px.width, px.height), px.samples).convert("RGB")
+
+
 def vue(p):
-    im = Image.open(p).convert("RGB")
+    im = ouvrir(p)
     w, h = im.size
     s = 224 / min(w, h)
     im = im.resize((max(224, round(w * s)), max(224, round(h * s))), Image.BICUBIC)
