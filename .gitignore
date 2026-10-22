@@ -1,0 +1,37 @@
+# Liste blanche : seul le code et les petits fichiers de configuration sortent. Jamais de livres, cours,
+# bases (.db), fiches, journaux ni questions posées (ask_log.db).
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/METHODE.md
+!/requirements.txt
+!/ask_anapath.py
+!/web_acp.py
+!/recherche.py
+!/split_anapath.py
+!/ocr_scans.py
+!/embed_anapath.py
+!/pages_anapath.py
+!/biblio_anapath.py
+!/editions_anapath.py
+!/build_terms.py
+!/fetch_librepathology.py
+!/extract_fiche.py
+!/assemble_fiche.py
+!/comparer_fiches.py
+!/rejouer_tests.py
+!/dd_anapath.py
+!/pplx_anapath.py
+!/acp_paquet.py
+!/acp_tokens.py
+!/tests_rag.tsv
+!/bench_acp.tsv
+!/vendor/
+!/pplx/
+/pplx/*
+!/pplx/gold.tsv
+!/fiches/
+/fiches/*
+!/fiches/entites_*.tsv
+__pycache__/

@@ -1,0 +1,21 @@
+id	question_fr	query_en	criteres
+cic_wt1	Sarcome avec réarrangement CIC : expression de WT1 en immunohistochimie ?	CIC-rearranged sarcoma WT1 immunohistochemistry	\bCIC\b ;; WT1 ;; sarcoma
+isn_classe6	Néphrite lupique classe VI : quel seuil de glomérules scléreux ?	lupus nephritis class VI advanced sclerosing glomeruli percentage	advanced scleros ;; 90\s*%
+columbia	Quelles sont les variantes de hyalinose segmentaire et focale selon Columbia ?	FSGS Columbia classification variants	Columbia ;; collaps ;; tip
+gleason_isup	Correspondance entre score de Gleason et groupe de grade ISUP ?	Gleason score to grade group correspondence	grade group ;; 4\s*\+\s*3
+tert_gbm	Fréquence des mutations du promoteur TERT dans le glioblastome IDH-sauvage ?	TERT promoter mutation frequency IDH-wildtype glioblastoma	TERT ;; IDH.?wild ;; \d\s*%
+dsrct_desmine	Aspect du marquage desmine dans la tumeur desmoplastique à petites cellules rondes ?	desmoplastic small round cell tumor desmin dot-like	desmin ;; dot ;; desmoplastic small round|DSRCT ;; WT1
+tip_def	Définition histologique de la lésion tip ?	glomerular tip lesion definition	tip lesion ;; tubular pole|proximal tubule|tubular lumen|tubular neck
+ewing_cd99	Marquage CD99 dans le sarcome d'Ewing ?	Ewing sarcoma CD99 membranous staining	Ewing ;; CD99 ;; membran ;; NKX2.?2|FLI1
+gist_dog1	Marqueurs immunohistochimiques des tumeurs stromales gastro-intestinales ?	GIST immunohistochemistry KIT CD117 DOG1	GIST|gastrointestinal stromal ;; DOG1|DOG-1|ANO1 ;; CD117|KIT ;; CD34
+meso_adk	Mésothéliome ou adénocarcinome : quel panel immunohistochimique ?	mesothelioma versus adenocarcinoma calretinin immunohistochemistry panel	mesothelioma ;; calretinin ;; adenocarcinoma ;; \bCEA\b|Ber.?EP4|MOC.?31|claudin
+barrett	Définition histologique de l'endobrachyœsophage de Barrett ?	Barrett esophagus goblet cells intestinal metaplasia definition	Barrett ;; goblet ;; columnar|intestinal metaplasia ;; defin|diagnos
+marsh	Classification de Marsh de la maladie cœliaque ?	celiac disease Marsh classification intraepithelial lymphocytes	Marsh ;; intraepithelial lymphocyte|IEL
+her2	Critères du score HER2 3+ en immunohistochimie dans le cancer du sein ?	HER2 immunohistochemistry score 3+ breast cancer criteria	HER2 ;; 3\+ ;; complete|circumferential ;; 10\s*%
+ccrcc_ca9	Marquage CA9 dans le carcinome rénal à cellules claires ?	clear cell renal cell carcinoma carbonic anhydrase IX CA9	CA9|CAIX|CA-IX|carbonic anhydrase ;; clear cell renal|clear cell RCC|ccRCC ;; membran|box
+lynch	Immunohistochimie des protéines MMR dans le syndrome de Lynch ?	Lynch syndrome mismatch repair protein immunohistochemistry	MLH1 ;; MSH2 ;; MSH6 ;; PMS2 ;; Lynch ;; immunohisto|IHC|loss
+pla2r	Intérêt du PLA2R dans la glomérulonéphrite extramembraneuse ?	membranous nephropathy PLA2R antigen staining	PLA2R|phospholipase A2 receptor ;; membranous ;; stain|immunohisto|granular|antibod
+oxford_iga	Score MEST-C de la néphropathie à IgA ?	IgA nephropathy Oxford classification MEST score	Oxford ;; MEST ;; IgA
+ptc_noyaux	Caractères nucléaires du carcinome papillaire de la thyroïde ?	papillary thyroid carcinoma nuclear features grooves pseudoinclusions	papillary thyroid|papillary carcinoma ;; groove ;; pseudo.?inclusion|intranuclear inclusion
+breslow	Comment mesurer l'épaisseur de Breslow ?	Breslow thickness measurement granular layer	Breslow ;; granular layer
+rs_cd30	Immunophénotype des cellules de Reed-Sternberg ?	Reed-Sternberg cells immunophenotype CD30 CD15	Reed.?Sternberg|Hodgkin cell|HRS ;; CD30 ;; CD15 ;; CD45|PAX5|CD20

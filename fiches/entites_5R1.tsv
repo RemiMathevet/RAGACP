@@ -1,0 +1,41 @@
+num	famille	fichier_colvin	entite_fr
+1	Podocytopathies et GEM	ch005	Lésions glomérulaires minimes
+2	Podocytopathies et GEM	ch009	Hyalinose segmentaire et focale primitive
+3	Podocytopathies et GEM	ch010	Hyalinose segmentaire et focale adaptative (secondaire)
+4	Podocytopathies et GEM	ch011	Glomérulopathie collapsante
+5	Podocytopathies et GEM	ch014	Glomérulonéphrite extramembraneuse primitive
+6	Podocytopathies et GEM	ch015	Glomérulonéphrite extramembraneuse secondaire
+7	GN à complexes immuns et à complément	ch021	Néphropathie à IgA
+8	GN à complexes immuns et à complément	ch022	Purpura rhumatoïde (vascularite à IgA)
+9	GN à complexes immuns et à complément	ch023	Néphropathie lupique
+10	GN à complexes immuns et à complément	ch052	Glomérulonéphrite aiguë post-streptococcique
+11	GN à complexes immuns et à complément	ch053	Glomérulonéphrite aiguë post-infectieuse non streptococcique
+12	GN à complexes immuns et à complément	ch054	Glomérulonéphrite à IgA associée au staphylocoque
+13	GN à complexes immuns et à complément	ch020	Glomérulonéphrite membranoproliférative à immunoglobulines
+14	GN à complexes immuns et à complément	ch019	Glomérulonéphrite à C3
+15	GN à complexes immuns et à complément	ch018	Maladie des dépôts denses
+16	GN à complexes immuns et à complément	ch026	Glomérulonéphrite cryoglobulinémique mixte
+17	GN à complexes immuns et à complément	ch027	Glomérulonéphrite anti-membrane basale glomérulaire
+18	Paraprotéines, dépôts organisés, métabolique	ch030	Maladie des dépôts d'immunoglobulines monoclonales
+19	Paraprotéines, dépôts organisés, métabolique	ch035	Néphropathie à cylindres myélomateux
+20	Paraprotéines, dépôts organisés, métabolique	ch039	Amylose AL
+21	Paraprotéines, dépôts organisés, métabolique	ch040	Amylose AA
+22	Paraprotéines, dépôts organisés, métabolique	ch046	Glomérulonéphrite fibrillaire
+23	Paraprotéines, dépôts organisés, métabolique	ch049	Néphropathie diabétique
+24	Héréditaires	ch067	Syndrome d'Alport
+25	Héréditaires	ch068	Maladie des membranes basales fines
+26	Héréditaires	ch082	Maladie de Fabry
+27	Vasculaires	ch095	Glomérulonéphrite pauci-immune associée aux ANCA
+28	Vasculaires	ch097	Granulomatose avec polyangéite
+29	Vasculaires	ch106	Syndrome hémolytique et urémique post-infectieux
+30	Vasculaires	ch109	Microangiopathie thrombotique médicamenteuse
+31	Vasculaires	ch116	Néphroangiosclérose hypertensive
+32	Vasculaires	ch122	Emboles de cristaux de cholestérol
+33	Tubulo-interstitielles	ch125	Nécrose tubulaire aiguë
+34	Tubulo-interstitielles	ch128	Néphrite interstitielle aiguë médicamenteuse
+35	Tubulo-interstitielles	ch147	Maladie associée aux IgG4
+36	Tubulo-interstitielles	ch151	Sarcoïdose rénale
+37	Tubulo-interstitielles	ch134	Néphropathie aiguë aux phosphates
+38	Infections	ch171	Pyélonéphrite aiguë
+39	Infections	ch172	Pyélonéphrite chronique
+40	Infections	ch193	Néphropathie à polyomavirus (BK)

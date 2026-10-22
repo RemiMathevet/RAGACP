@@ -1,0 +1,17 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Hépatites virales	ch006	Hépatite virale aiguë	acute viral hepatitis
+2	Hépatites virales	ch006	Hépatite chronique virale B	chronic hepatitis B ground glass hepatocytes
+3	Hépatites virales	ch006	Hépatite chronique virale C	chronic hepatitis C grading staging
+4	Hépatites immunes	ch011	Hépatite auto-immune	autoimmune hepatitis interface hepatitis plasma cells
+5	Toxiques	ch009	Hépatopathie médicamenteuse	drug-induced liver injury
+6	Stéatoses	ch010	Stéatohépatite métabolique (MASH, ex-NASH)	nonalcoholic steatohepatitis ballooning NAS score
+7	Stéatoses	ch010	Stéatohépatite alcoolique	alcoholic steatohepatitis Mallory-Denk bodies
+8	Cholestases	ch012	Cholangite biliaire primitive	primary biliary cholangitis florid duct lesion
+9	Cholestases	ch012	Cholangite sclérosante primitive	primary sclerosing cholangitis onion skin fibrosis
+10	Cholestases	ch012	Obstruction biliaire extrahépatique	large bile duct obstruction ductular reaction bile infarct
+11	Surcharges et maladies génétiques	ch016	Hémochromatose et surcharges en fer	hereditary hemochromatosis iron overload Perls grading
+12	Surcharges et maladies génétiques	ch017	Maladie de Wilson	Wilson disease copper rhodanine
+13	Surcharges et maladies génétiques	ch017	Déficit en alpha-1-antitrypsine	alpha-1 antitrypsin deficiency PAS diastase globules
+14	Vasculaire	ch014	Syndrome d'obstruction sinusoïdale, Budd-Chiari et foie cardiaque	sinusoidal obstruction syndrome Budd-Chiari outflow obstruction congestion
+15	Granulomes	ch008	Hépatite granulomateuse	granulomatous hepatitis granulomas causes
+16	Transplantation	ch015	Rejet aigu cellulaire du greffon hépatique	acute cellular rejection Banff rejection activity index

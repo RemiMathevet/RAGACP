@@ -1,0 +1,7 @@
+id	question	livres_attendus	piege
+gliome_idh_cdkn2a	Astrocytome IDH-muté avec délétion homozygote CDKN2A/B, sans nécrose ni prolifération microvasculaire : quel grade selon l'OMS 2021 ?	who_central_nervous_system,bis_central_nervous_system	OMS 2021 absente : doit le dire ; la base (2016) ne grade pas sur CDKN2A
+gliome_idh_wt_tert	Gliome diffus IDH-sauvage de l'adulte avec mutation du promoteur TERT, sans nécrose : peut-on parler de glioblastome ?	who_central_nervous_system,bis_central_nervous_system	glioblastome moléculaire = OMS 2021, absent ; signaler l'édition
+sarcome_cic	Sarcome à petites cellules rondes de la cuisse, WT1 positif : comment confirmer un sarcome avec réarrangement CIC et l'éliminer d'une tumeur desmoplastique à petites cellules rondes ?	who_soft_tissue_and_bone_tumours_5th_201,dp_soft_tissue_tumors,bis_soft_tissue_tumors	livre tissus mous (pas os) ; WT1 n'est pas spécifique de la TDPCR ; FISH CIC faux négatifs
+lupus_isn_rps	Quels sont les critères de la classification ISN/RPS de la néphrite lupique, classes I à VI ?	colvin_kidney,oxford_handbook,handbook_of_renal_biopsy_pathology	classe VI = > 90 % de glomérules scléreux, ne pas tronquer
+hsf_columbia	Quelles sont les variantes histologiques de la hyalinose segmentaire et focale selon la classification de Columbia ?	colvin_kidney	5 variantes : NOS, périhilaire, cellulaire, tip, collapsante
+gleason_isup	Comment passe-t-on du score de Gleason aux groupes de grade ISUP dans l'adénocarcinome prostatique ?	who_urinary_system_and_male_genital_orga	groupe 2 = 3+4, groupe 3 = 4+3
