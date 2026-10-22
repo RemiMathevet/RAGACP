@@ -530,7 +530,7 @@ def rendre(d, shown, question="", rendus=None, juge=None):
             retires.append((fr, v, n, "non retrouvé")); continue
         if found != n:
             notes.append(f"en fait #{found}")
-        appui = _norm(v + " " + shown[found]["title"])
+        appui = _norm(v + " " + shown[found]["title"] + " " + (question or ""))   # « trisomie 18 » de la question n'est pas un chiffre inventé
         if nums := [x for x in _NUM.findall(fr) if f" {_norm(x)} " not in f" {appui} "]:
             notes.append("chiffre non sourcé : " + ", ".join(nums))
         if bad := sorted(_codes_adicap(fr) - (rendus or set())):
@@ -689,4 +689,7 @@ if __name__ == "__main__":
     hz, _ = rendre({"elements": [{"fr": "focal (2-3 foyers)", "verbatim": "termed focal (2–3 foci)", "n": 1}]},
                    {1: {"title": "t", "chunk_text": "and were termed focal (2–3 foci) or multifocal"}})
     assert "chiffre non sourcé" not in hz, hz
+    hq, _ = rendre({"elements": [{"fr": "la trisomie 18 donne une agénésie radiale", "verbatim": "radial agenesis", "n": 1}]},
+                   {1: {"title": "t", "chunk_text": "with radial agenesis"}}, "Différentiels de la trisomie 18")
+    assert "chiffre non sourcé" not in hq, hq
     print("ok")
