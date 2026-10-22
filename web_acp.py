@@ -7,7 +7,7 @@ Accès : formulaire de connexion + cookie de session ; identifiant/mot de passe 
 (aucun défaut), clé de session dans ~/.config/acp_secret. /dl/<jeton> : téléchargement du paquet, jeton à usage unique.
 Lecture seule. Libre Pathology : CC BY-NC-SA 4.0, attribué avec lien sous chaque passage.
 """
-import csv, hmac, json, os, sqlite3, threading, time, uuid
+import csv, hmac, json, os, re, sqlite3, threading, time, uuid
 from html import escape
 from pathlib import Path
 from flask import Flask, Response, abort, jsonify, redirect, request, send_file, session, url_for
@@ -41,7 +41,7 @@ def page(titre, corps):
     return (f"<!doctype html><html lang=fr><meta charset=utf-8><meta name=viewport content='width=device-width'>"
             f"<title>{escape(titre)}</title>{CSS}<header><h2><a href='/demander'>Anapath ACP</a></h2>"
             f"<a href='/demander'>Demander</a><a href='/bench'>Benchmark</a><a href='/fiches'>Fiches</a><a href='/methode'>Méthode</a><span class=m>test — fiches en brouillon</span><a href='/deconnexion' style='margin-left:auto'>Déconnexion</a></header>"
-            f"{AVERT}{corps}")
+            f"{AVERT}{corps}" + ("<script src='/widget-feedback.js' defer></script>" if WIDGET.exists() else ""))
 
 
 AVERT = ("<p class='r m' role=note><b>Outil documentaire, pas un avis diagnostique.</b> Les réponses citent des livres "
@@ -75,6 +75,46 @@ def connexion():
             f"<p><input name=u placeholder=Identifiant autocomplete=username required autofocus></p>"
             f"<p><input name=p type=password placeholder='Mot de passe' autocomplete=current-password required></p>"
             f"<button>Se connecter</button></form>")
+
+
+# ─── Ampoule de retours : widget de data.pazuzu (source unique foetodata_hub), même format de fichier ───
+WIDGET = Path(os.environ.get("ACP_WIDGET", Path.home() / "Bureau/foetodata_hub/static/widget-feedback.js"))
+FEEDBACK = ROOT / "feedback"
+TYPES = {"idee", "bug", "ux", "autre"}
+
+
+@app.get("/widget-feedback.js")
+def widget_feedback():
+    return send_file(WIDGET, mimetype="application/javascript", max_age=0) if WIDGET.exists() else abort(404)
+
+
+@app.route("/api/feedback", methods=["GET", "POST"])
+def api_feedback():
+    """Sous session (before_request). GET = liste ; POST = un .txt dans feedback/ (hors dépôt, hors paquet)."""
+    if request.method == "GET":
+        items = []
+        for f in sorted(FEEDBACK.glob("*.txt"), reverse=True)[:500]:
+            tete, _, corps = f.read_text(encoding="utf-8").partition("\n---\n")
+            champs = dict(l.split(" : ", 1) for l in tete.splitlines() if " : " in l)
+            items.append({"date": champs.get("Date", ""), "author": champs.get("Auteur", ""), "type": champs.get("Type", ""),
+                          "page": champs.get("Page", ""), "text": corps.strip()})
+        return jsonify({"items": items})
+    d = request.get_json(silent=True) or {}
+    texte = str(d.get("text") or "").strip()[:5000]
+    if not texte:
+        return jsonify({"ok": False, "error": "texte requis"}), 400
+    FEEDBACK.mkdir(exist_ok=True)
+    fichiers = list(FEEDBACK.glob("*.txt"))
+    recents = sum(1 for f in fichiers if f.stat().st_mtime > time.time() - 3600)
+    if len(fichiers) >= 2000 or recents >= 30:          # plafonds : 2000 retours, 30 par heure
+        return jsonify({"ok": False, "error": "trop de retours, réessaie plus tard"}), 429
+    nom = re.sub(r"[^\w -]", "", str(d.get("name") or "Anonyme"))[:30].strip() or "Anonyme"
+    typ = d.get("type") if d.get("type") in TYPES else "autre"
+    page_ = re.sub(r"[^\w/-]", "", str(d.get("page") or ""))[:40]
+    t = time.strftime("%Y-%m-%d %H:%M:%S")
+    (FEEDBACK / f"{time.strftime('%Y%m%d_%H%M%S')}_{int(time.time() * 1000) % 1000:03d}_{typ}.txt").write_text(
+        f"Date : {t}\nAuteur : {nom}\nType : {typ}\nPage : {page_}\n---\n{texte}\n", encoding="utf-8")
+    return jsonify({"ok": True})
 
 
 @app.get("/dl/<jeton>")
