@@ -118,7 +118,9 @@ def _magos(prompt, timeout_s=900, system=None, model=None, trace=None, etape="")
                 r = json.load(urllib.request.urlopen(urllib.request.Request(url, body, h), timeout=3600))
                 break
             except urllib.error.HTTPError as e:
-                if e.code != 429 or essai == 7:
+                corps = e.read().decode(errors="replace") if e.code == 429 else ""
+                # quota du JOUR épuisé : inutile d'attendre (la boucle coûtait ~200 s par question, 22/10)
+                if e.code != 429 or essai == 7 or "day" in corps or "jour" in corps:
                     raise
                 time.sleep(7 * (essai + 1))
         msg = r["choices"][0]["message"]
@@ -484,7 +486,14 @@ def juger(synthese, gardes, shown, trace=None):
     txt += f"ÉLÉMENT 0 (synthèse) : {synthese}\n"
     txt += "".join(f"ÉLÉMENT {i} : FR = {fr}\n   VERBATIM (#{n}) = {v}\n" for i, (fr, v, n, _) in enumerate(gardes, 1))
     try:
-        d = parse_json(_magos(txt, system=JUGE, model=JUGE_MODEL or None, trace=trace, etape="relecteur"))
+        if JUGE_MODEL == "claude":                  # Sonnet 5.5 (API Anthropic) : verdicts imposés par schéma
+            import extract_fiche as ef
+            out = ef.claude_json(txt, JUGE, ef._SCHEMA_RELU, effort="low", max_tokens=8000)
+            if trace is not None:
+                trace.append({"etape": "relecteur", "modele": ef.CLAUDE, "raisonnement": "", "sortie": out})
+            d = parse_json(out)
+        else:
+            d = parse_json(_magos(txt, system=JUGE, model=JUGE_MODEL or None, trace=trace, etape="relecteur"))
         return {int(x["i"]): (str(x.get("v", "")).strip().upper()[:1], str(x.get("pourquoi", "")))
                 for x in d.get("verdicts", []) if isinstance(x, dict)}
     except Exception:

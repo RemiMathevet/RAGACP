@@ -32,7 +32,7 @@ Terminologie : **ADICAP 2024** (ANS) et MeSH FR/EN reliés ; un code ADICAP n'es
 1. Le modèle (**DeepSeek V4 Flash**, via **Albert**, l'API de la DINUM) mène lui-même la recherche : jusqu'à 4 tours, 2 requêtes par tour, en anglais, éventuellement dans un livre précis. Une requête trop proche d'une précédente est refusée ; les passages déjà vus ne sont pas renvoyés.
 2. Il répond par une liste d'éléments : *phrase en français + citation exacte du livre + numéro du passage*.
 3. **Contrôle mot pour mot** : chaque citation est cherchée dans le passage. Introuvable → l'élément est **retiré**. Presque exacte (ligne de tableau recomposée) → remplacée par le vrai texte du livre (**orange**).
-4. **Relecteur** : un second modèle (**gpt-oss-120b**) vérifie que la citation *soutient* la phrase — même entité, même édition. Contredit ou hors sujet → **retiré** ; soutien partiel → **orange**.
+4. **Relecteur** : un second modèle (**Claude Sonnet 5.5**, API Anthropic ; auparavant gpt-oss-120b, plafonné à 1 000 appels par jour) vérifie que la citation *soutient* la phrase — même entité, même édition. Contredit ou hors sujet → **retiré** ; soutien partiel → **orange**.
 5. La **synthèse** (1–2 phrases) vient du savoir du modèle : elle n'est affichée en clair que si le relecteur la juge soutenue.
 6. **Préciser** : une question puis deux précisions au plus ; seuls les éléments gardés et leurs passages sont transmis, jamais la synthèse ni les éléments retirés.
 7. **Diagnostics différentiels** : même chaîne, les arguments rangés par diagnostic (pour / contre / distingue).
