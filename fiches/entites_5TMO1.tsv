@@ -1,0 +1,16 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Fibroblastiques	ch002	Fibromatose de type desmoïde	desmoid fibromatosis nuclear beta-catenin
+2	Fibroblastiques	ch003	Fasciite nodulaire	nodular fasciitis USP6
+3	Intra-abdominaux	ch005	Tumeur stromale gastro-intestinale (GIST)	gastrointestinal stromal tumor KIT DOG1
+4	Musculaires	ch006	Léiomyosarcome	leiomyosarcoma
+5	Gaines nerveuses	ch009	Schwannome et neurofibrome	schwannoma neurofibroma
+6	Sarcomes fusiformes	ch010	Sarcome synovial	synovial sarcoma SS18
+7	Sarcomes fusiformes	ch010	Tumeur maligne des gaines nerveuses périphériques	malignant peripheral nerve sheath tumor H3K27me3
+8	Cellules rondes	ch014	Sarcome d'Ewing et sarcomes à cellules rondes	Ewing sarcoma CIC BCOR round cell
+9	Cellules rondes	ch014	Rhabdomyosarcome	rhabdomyosarcoma myogenin MyoD1
+10	Adipeux	ch015	Lipome et variantes	lipoma spindle cell pleomorphic lipoma
+11	Adipeux	ch016	Liposarcome bien différencié et dédifférencié	well-differentiated dedifferentiated liposarcoma MDM2
+12	Adipeux	ch016	Liposarcome myxoïde	myxoid liposarcoma DDIT3
+13	Vasculaires	ch018	Angiosarcome	angiosarcoma
+14	Pléomorphes	ch013	Sarcome pléomorphe indifférencié	undifferentiated pleomorphic sarcoma
+15	Myxoïdes	ch021	Myxofibrosarcome	myxofibrosarcoma

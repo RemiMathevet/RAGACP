@@ -1,0 +1,14 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Gliomes diffus	ch003	Astrocytome diffus IDH-muté	diffuse astrocytoma IDH mutant ATRX
+2	Gliomes diffus	ch003	Oligodendrogliome	oligodendroglioma 1p19q codeletion
+3	Gliomes diffus	ch003	Glioblastome	glioblastoma necrosis microvascular proliferation
+4	Autres astrocytomes	ch004	Astrocytome pilocytique	pilocytic astrocytoma Rosenthal fibers
+5	Épendymaires	ch005	Épendymome	ependymoma perivascular pseudorosettes
+6	Glioneuronaux	ch007	Gangliogliome	ganglioglioma dysmorphic neurons
+7	Méninges	ch009	Méningiome et grades	meningioma atypical grade brain invasion mitoses
+8	Embryonnaires	ch010	Médulloblastome	medulloblastoma
+9	Nerfs	ch013	Schwannome	schwannoma Antoni A B
+10	Hématolymphoïdes	ch016	Lymphome primitif du SNC	primary CNS lymphoma diffuse large B-cell
+11	Région sellaire	ch008	Adénome hypophysaire	pituitary adenoma
+12	Métastases	ch018	Métastases cérébrales	brain metastases immunohistochemistry
+13	Inflammatoires	ch002	Démyélinisation pseudo-tumorale	tumefactive demyelination macrophages Creutzfeldt cells

@@ -1,0 +1,15 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Proliférations intracanalaires	ch003	Hyperplasie canalaire simple et atypique	usual ductal hyperplasia atypical ductal hyperplasia
+2	Proliférations intracanalaires	ch004	Lésions à cellules cylindriques et atypie épithéliale plane	columnar cell lesions flat epithelial atypia
+3	Néoplasie lobulaire	ch005	Néoplasie lobulaire in situ (CLIS, HLA)	lobular carcinoma in situ atypical lobular hyperplasia E-cadherin
+4	Proliférations intracanalaires	ch003	Carcinome canalaire in situ	ductal carcinoma in situ nuclear grade necrosis
+5	Fibroépithéliales	ch006	Fibroadénome et tumeur phyllode	fibroadenoma phyllodes tumor stromal overgrowth
+6	Lésions sclérosantes	ch007	Adénose sclérosante et cicatrice radiaire	sclerosing adenosis radial scar complex sclerosing lesion
+7	Lésions papillaires	ch008	Lésions papillaires (papillome, carcinome papillaire)	intraductal papilloma papillary carcinoma myoepithelial
+8	Carcinomes infiltrants	ch010	Carcinome infiltrant de type non spécifique	invasive ductal carcinoma no special type Nottingham grade
+9	Carcinomes infiltrants	ch010	Carcinome lobulaire infiltrant	invasive lobular carcinoma single file E-cadherin
+10	Carcinomes infiltrants	ch009	Carcinome micro-invasif	microinvasive carcinoma 1 mm
+11	Lésions fusiformes	ch011	Lésions fusiformes du sein	spindle cell lesions metaplastic carcinoma fibromatosis
+12	Mamelon	ch015	Maladie de Paget du mamelon	Paget disease of the nipple
+13	Ganglions	ch018	Ganglions axillaires (métastases, micrométastases)	axillary lymph node macrometastasis micrometastasis isolated tumor cells
+14	Après traitement	ch019	Effets du traitement néoadjuvant	neoadjuvant treatment effect residual cancer burden

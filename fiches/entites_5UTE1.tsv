@@ -1,0 +1,13 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Col	ch002	Lésions malpighiennes intraépithéliales (LSIL/HSIL)	squamous intraepithelial lesion p16 CIN
+2	Col	ch002	Carcinome épidermoïde du col	cervical squamous cell carcinoma invasion
+3	Col	ch003	Adénocarcinome in situ du col	adenocarcinoma in situ cervix
+4	Col	ch003	Adénocarcinome endocervical	endocervical adenocarcinoma HPV-associated
+5	Endomètre	ch004	Datation de l'endomètre	endometrial dating proliferative secretory
+6	Endomètre	ch005	Endométrite chronique	chronic endometritis plasma cells
+7	Endomètre	ch006	Hyperplasie endométriale	atypical endometrial hyperplasia endometrial intraepithelial neoplasia
+8	Endomètre	ch007	Adénocarcinome endométrioïde	endometrioid carcinoma FIGO grade
+9	Endomètre	ch007	Carcinome séreux de l'endomètre	serous endometrial carcinoma p53
+10	Mésenchymateux	ch008	Léiomyome et léiomyosarcome	leiomyoma leiomyosarcoma necrosis mitoses atypia
+11	Mésenchymateux	ch008	Carcinosarcome	carcinosarcoma malignant mixed Mullerian tumor
+12	Mésenchymateux	ch008	Sarcome du stroma endométrial	endometrial stromal sarcoma

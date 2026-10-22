@@ -1,0 +1,15 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Œsophage	ch001	Œsophagite à éosinophiles	eosinophilic esophagitis eosinophils per high-power field
+2	Œsophage	ch001	Œsophagite peptique	reflux esophagitis basal cell hyperplasia
+3	Œsophage	ch001	Endobrachyœsophage de Barrett et dysplasie	Barrett esophagus intestinal metaplasia dysplasia
+4	Estomac	ch001	Gastrite à Helicobacter pylori	Helicobacter pylori gastritis
+5	Estomac	ch001	Gastrite atrophique auto-immune	autoimmune atrophic gastritis enterochromaffin-like
+6	Intestin grêle	ch001	Maladie cœliaque	celiac disease intraepithelial lymphocytes villous atrophy
+7	Côlon	ch001	Colite microscopique	collagenous colitis lymphocytic colitis
+8	Côlon	ch001	Maladie de Crohn	Crohn disease granulomas transmural
+9	Côlon	ch001	Rectocolite hémorragique	ulcerative colitis crypt architectural distortion
+10	Côlon	ch001	Colite ischémique	ischemic colitis withered crypts
+11	Côlon	ch001	Colite infectieuse	acute infectious self-limited colitis
+12	Polypes	ch001	Adénome et dysplasie	tubular adenoma low-grade high-grade dysplasia
+13	Polypes	ch001	Lésion festonnée sessile	sessile serrated lesion
+14	Transplantation	ch001	Maladie du greffon contre l'hôte digestive	graft-versus-host disease apoptosis crypts

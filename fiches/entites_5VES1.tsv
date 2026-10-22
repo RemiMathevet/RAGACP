@@ -1,0 +1,12 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Lésions planes	ch003	Carcinome urothélial in situ	urothelial carcinoma in situ
+2	Lésions planes	ch003	Atypie réactive et atypie de signification indéterminée	reactive urothelial atypia
+3	Papillaires	ch004	Néoplasie papillaire de faible potentiel de malignité	papillary urothelial neoplasm of low malignant potential papilloma
+4	Papillaires	ch004	Carcinome urothélial papillaire de bas et de haut grade	low-grade high-grade papillary urothelial carcinoma
+5	Inversées	ch005	Papillome inversé	inverted papilloma
+6	Infiltrants	ch006	Carcinome urothélial infiltrant	invasive urothelial carcinoma lamina propria muscularis propria
+7	Variantes	ch007	Variantes du carcinome urothélial	micropapillary nested plasmacytoid sarcomatoid variant
+8	Glandulaires	ch009	Cystite glandulaire et adénocarcinome vésical	cystitis glandularis adenocarcinoma bladder
+9	Inflammatoires	ch011	Cystites	interstitial cystitis BCG granulomatous polypoid cystitis
+10	Mésenchymateux	ch012	Tumeur myofibroblastique inflammatoire	inflammatory myofibroblastic tumor postoperative spindle cell nodule
+11	Cytologie	ch015	Cytologie urinaire (système de Paris)	Paris system urine cytology

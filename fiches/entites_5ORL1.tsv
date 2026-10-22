@@ -1,0 +1,11 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Malpighiens	ch003	Dysplasie malpighienne des VADS	squamous dysplasia oral laryngeal
+2	Malpighiens	ch004	Carcinome épidermoïde des VADS	conventional squamous cell carcinoma head and neck
+3	Malpighiens	ch005	Carcinome épidermoïde de l'oropharynx HPV-induit	HPV-associated oropharyngeal p16
+4	Glandes salivaires	ch006	Adénome pléomorphe	pleomorphic adenoma
+5	Glandes salivaires	ch006	Carcinome adénoïde kystique	adenoid cystic carcinoma perineural
+6	Glandes salivaires	ch006	Carcinome mucoépidermoïde	mucoepidermoid carcinoma MAML2
+7	Neuroectodermiques	ch008	Esthésioneuroblastome	olfactory neuroblastoma Hyams grade
+8	Nez et sinus	ch013	Papillome nasosinusien	sinonasal papilloma inverted Schneiderian
+9	Lymphomes	ch009	Lymphome NK/T extraganglionnaire de type nasal	extranodal NK/T-cell lymphoma nasal type EBV
+10	Oreille	ch016	Cholestéatome	cholesteatoma keratinizing

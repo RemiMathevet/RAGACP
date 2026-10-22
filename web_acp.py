@@ -7,7 +7,7 @@ Accès : formulaire de connexion + cookie de session ; identifiant/mot de passe 
 (aucun défaut), clé de session dans ~/.config/acp_secret. /dl/<jeton> : téléchargement du paquet, jeton à usage unique.
 Lecture seule. Libre Pathology : CC BY-NC-SA 4.0, attribué avec lien sous chaque passage.
 """
-import csv, hmac, json, os, re, sqlite3, threading, time, uuid
+import csv, functools, hmac, json, os, re, sqlite3, threading, time, uuid
 from html import escape
 from pathlib import Path
 from flask import Flask, Response, abort, jsonify, redirect, request, send_file, session, url_for
@@ -141,9 +141,39 @@ def racine():
     return redirect("/demander")
 
 
+@functools.lru_cache(maxsize=1)
+def ouvrages():
+    """Liste repliable des sources de la base (titre = nom du PDF), calculée une fois par démarrage."""
+    from split_anapath import jobs
+    con = sqlite3.connect(ROOT / "anapath_rag.db")
+    n = dict(con.execute("SELECT source_short, count(*) FROM chunk_meta GROUP BY 1"))
+    info = {k: (e, a) for k, e, a in con.execute("SELECT source_short, edition, annee FROM source_info")}
+    livres, cours = [], {}
+    for k, pdf, _, dossier in jobs(None):
+        if k not in n:
+            continue
+        if dossier == "livres":
+            e, an = info.get(k, (None, None))
+            # mentions de sites de téléchargement retirées des titres affichés
+            ti = re.sub(r"(?i)\s*\((?:[^()]*?(?:z-?lib|1lib|libgen|library\.sk)[^()]*)\)|\s*-?\s*libgen\.\w+|[_\s]*medibos\.blogspot\.com"
+                        r"|\s*(?:by\s+)?coll\s+z\s+lib", "", pdf.stem)
+            livres.append((ti.replace("_", " ").strip(" -"), e or "", an or "", n[k]))
+        else:
+            cours.setdefault(str(pdf.parent.relative_to(ROOT / "cours")), []).append(pdf.stem.replace("_", " "))
+    t = "".join(f"<tr><td>{escape(ti)}</td><td>{escape(str(e))}</td><td>{an}</td><td>{c}</td></tr>" for ti, e, an, c in sorted(livres))
+    html = (f"<h2>Les ouvrages</h2><details><summary><b>{len(livres)} livres</b> (preuve) — titre, édition, année, "
+            f"passages indexés</summary><div style=overflow-x:auto><table><tr><th>titre</th><th>éd.</th><th>année</th>"
+            f"<th>passages</th></tr>{t}</table></div></details>")
+    html += (f"<details><summary><b>{sum(map(len, cours.values()))} cours</b> (preuve inférieure), par dossier"
+             f"{' + Libre Pathology (wiki, CC BY-NC-SA 4.0, ' + str(n['librepathology']) + ' passages)' if 'librepathology' in n else ''}"
+             f"</summary>" + "".join(f"<p><b>{escape(d)}</b> ({len(v)}) : <span class=m>{escape(' · '.join(sorted(v)))}</span></p>"
+                                     for d, v in sorted(cours.items())) + "</details>")
+    return html
+
+
 @app.get("/methode")
 def methode():
-    return page("Méthode", markdown.markdown((ROOT / "METHODE.md").read_text(encoding="utf-8")))
+    return page("Méthode", markdown.markdown((ROOT / "METHODE.md").read_text(encoding="utf-8")) + ouvrages())
 
 
 @app.get("/fiches")

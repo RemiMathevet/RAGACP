@@ -1,0 +1,13 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Lésions précancéreuses	ch006	Néoplasie intraépithéliale prostatique de haut grade	high-grade prostatic intraepithelial neoplasia
+2	Lésions précancéreuses	ch006	Carcinome intracanalaire de la prostate	intraductal carcinoma of the prostate
+3	Adénocarcinome	ch007	Adénocarcinome limité sur biopsie	limited adenocarcinoma needle biopsy diagnostic criteria
+4	Pièges diagnostiques	ch008	Lésions mimant un adénocarcinome (atrophie, adénose)	atrophy partial atrophy adenosis mimickers basal cells
+5	Grade	ch010	Grade de Gleason et groupes ISUP	Gleason grading grade groups cribriform
+6	Atypies	ch011	Glandes atypiques suspectes (ASAP)	atypical glands suspicious for carcinoma
+7	Compte rendu	ch009	Compte rendu des biopsies prostatiques	reporting cancer extent perineural invasion length
+8	Adénocarcinome	ch012	Adénocarcinome canalaire	prostatic ductal adenocarcinoma
+9	Neuroendocrine	ch013	Différenciation neuroendocrine et carcinome à petites cellules	neuroendocrine differentiation small cell carcinoma prostate
+10	Après traitement	ch015	Prostate après traitement	radiation hormonal therapy effect prostate
+11	Inflammatoire	ch005	Prostatite granulomateuse	granulomatous prostatitis
+12	Autres	ch016	Carcinome urothélial de la prostate	urothelial carcinoma involving prostate

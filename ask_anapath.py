@@ -113,7 +113,14 @@ def _magos(prompt, timeout_s=900, system=None, model=None, trace=None, etape="")
         if LLM == "albert":
             url = "https://albert.api.etalab.gouv.fr/v1/chat/completions"
             h["Authorization"] = "Bearer " + open(os.path.expanduser("~/.config/albert.key")).read().strip()
-        r = json.load(urllib.request.urlopen(urllib.request.Request(url, body, h), timeout=3600))
+        for essai in range(8):                  # Albert : 10 requêtes/minute par modèle -> HTTP 429, on attend
+            try:
+                r = json.load(urllib.request.urlopen(urllib.request.Request(url, body, h), timeout=3600))
+                break
+            except urllib.error.HTTPError as e:
+                if e.code != 429 or essai == 7:
+                    raise
+                time.sleep(7 * (essai + 1))
         msg = r["choices"][0]["message"]
         if THINK and not model and not (msg.get("content") or "").strip():
             # réflexion qui épuise max_tokens (60 000 caractères, sortie vide : meso_adk, bench_acp_1) -> sans réflexion

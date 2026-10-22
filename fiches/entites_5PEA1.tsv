@@ -1,0 +1,13 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Mélanocytaires	ch003	Nævus atypique (dysplasique)	dysplastic nevus architectural cytologic atypia
+2	Mélanocytaires	ch003	Nævus de Spitz	Spitz nevus Kamino bodies
+3	Mélanomes	ch004	Mélanome à extension superficielle	superficial spreading melanoma pagetoid
+4	Mélanomes	ch004	Lentigo malin et mélanome de Dubreuilh	lentigo maligna melanoma
+5	Mélanomes	ch005	Mélanome desmoplastique	desmoplastic melanoma S100 SOX10
+6	Mélanomes	ch006	Compte rendu du mélanome	Breslow thickness ulceration mitotic rate margins
+7	Carcinomes	ch007	Carcinome basocellulaire	basal cell carcinoma nodular infiltrative morpheaform
+8	Carcinomes	ch008	Kératose actinique et carcinome épidermoïde in situ	actinic keratosis Bowen disease
+9	Carcinomes	ch008	Carcinome épidermoïde cutané	cutaneous squamous cell carcinoma
+10	Carcinomes	ch008	Kératoacanthome	keratoacanthoma
+11	Annexes	ch010	Carcinome sébacé	sebaceous carcinoma
+12	Mésenchymateux	ch011	Dermatofibrome et dermatofibrosarcome	dermatofibroma dermatofibrosarcoma protuberans CD34

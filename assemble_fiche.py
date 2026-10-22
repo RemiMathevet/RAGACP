@@ -19,6 +19,10 @@ CHAMPS = [("definition", "Définition"), ("critere_positif", "Critères positifs
           ("if_attendue", "Immunofluorescence"), ("me_attendue", "Microscopie électronique"),
           ("differentiel", "Diagnostic différentiel"), ("technique", "Technique qui tranche"),
           ("ne_pas_conclure", "Pièges / ne pas conclure")]
+CHAMPS_GEN = [("definition", "Définition"), ("critere_positif", "Critères positifs (MO)"), ("architecture", "Architecture / topographie"),
+              ("mesure", "À mesurer / compter"), ("gradation", "Grade / stade / classification"), ("ihc", "Immunohistochimie"),
+              ("moleculaire", "Biologie moléculaire"), ("differentiel", "Diagnostic différentiel"),
+              ("compte_rendu", "Compte rendu"), ("ne_pas_conclure", "Pièges / ne pas conclure")]
 CHAMPS_FOIE = [("definition", "Définition"), ("critere_positif", "Critères positifs (MO)"), ("topographie", "Topographie"),
                ("mesure", "À mesurer / compter"), ("gradation", "Score / classification"),
                ("colorations", "Colorations spéciales"), ("ihc", "Immunohistochimie"),
@@ -48,6 +52,10 @@ def ligne(e):
         marque.append("⚠ ajusté")
     if e.get("src_corrigee"):
         marque.append("✱")
+    if str(e.get("relecteur", "")).startswith("P"):
+        marque.append("◐ soutien partiel")
+    if e.get("seuils"):
+        marque.append("⚠ seuil " + e["seuils"].split(" : ")[0])
     v = " ".join(e["verbatim"].split())
     return f"- {e['fr']}  \n  « *{v}* » [{e['source']}, p. {e.get('page') or '?'}] {' '.join(marque)}".rstrip()
 
@@ -56,7 +64,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("tsv"); ap.add_argument("dossier"); ap.add_argument("sortie")
     ap.add_argument("--titre", default="Fiche")
-    ap.add_argument("--organe", choices=["rein", "foie"], default="rein")
+    ap.add_argument("--organe", default="rein")
     a = ap.parse_args()
     tc = sqlite3.connect(ROOT / "anapath_terms.db")
     ents = list(csv.DictReader(open(a.tsv), delimiter="\t"))
@@ -82,7 +90,7 @@ def main():
                 corps.append(f"**Codes (à valider)** — MeSH {m} *{lab}* · ADICAP : {adt}\n")
         else:
             corps.append("**Codes** — aucun MeSH rattaché (à rattacher à la main)\n")
-        for k, titre in (CHAMPS_FOIE if a.organe == "foie" else CHAMPS):
+        for k, titre in {"foie": CHAMPS_FOIE, "rein": CHAMPS}.get(a.organe, CHAMPS_GEN):
             els = d["champs"].get(k)
             if els:
                 corps.append(f"**{titre}**\n" + "\n".join(ligne(e) for e in els) + "\n")

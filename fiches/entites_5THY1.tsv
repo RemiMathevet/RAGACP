@@ -1,0 +1,13 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Thyroïdites	ch009	Thyroïdite de Hashimoto	Hashimoto thyroiditis lymphocytic oncocytic
+2	Thyroïdites	ch009	Thyroïdite granulomateuse subaiguë (de Quervain)	subacute granulomatous thyroiditis
+3	Lésions folliculaires	ch011	Nodule hyperplasique et goitre multinodulaire	hyperplastic nodule multinodular goiter
+4	Lésions folliculaires	ch011	Adénome folliculaire	follicular adenoma capsule
+5	Lésions folliculaires	ch011	Carcinome folliculaire	follicular carcinoma capsular vascular invasion
+6	Lésions folliculaires	ch011	Tumeurs oncocytaires (à cellules de Hürthle)	Hurthle cell oncocytic adenoma carcinoma
+7	Lésions papillaires	ch010	Carcinome papillaire	papillary thyroid carcinoma nuclear features variants
+8	Lésions papillaires	ch010	NIFTP	noninvasive follicular thyroid neoplasm with papillary-like nuclear features
+9	Lésions solides	ch012	Carcinome médullaire	medullary thyroid carcinoma calcitonin amyloid
+10	Lésions solides	ch012	Carcinome peu différencié	poorly differentiated thyroid carcinoma Turin criteria
+11	Lésions indifférenciées	ch013	Carcinome anaplasique	anaplastic thyroid carcinoma
+12	Cytologie	ch005	Cytologie thyroïdienne (Bethesda)	Bethesda system thyroid cytopathology categories

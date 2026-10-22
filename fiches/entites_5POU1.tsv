@@ -1,0 +1,16 @@
+num	famille	chapitre	entite_fr	entite_en
+1	Granulomatoses	ch004	Sarcoïdose pulmonaire	pulmonary sarcoidosis non-necrotizing granulomas lymphangitic
+2	Pneumopathies interstitielles	ch010	Pneumopathie d'hypersensibilité	hypersensitivity pneumonitis bronchiolocentric poorly formed granulomas
+3	Pneumopathies interstitielles	ch010	Pneumopathie interstitielle commune (PIC/UIP)	usual interstitial pneumonia fibroblastic foci honeycombing
+4	Pneumopathies interstitielles	ch010	Pneumopathie interstitielle non spécifique (PINS)	nonspecific interstitial pneumonia uniform
+5	Pneumopathies interstitielles	ch003	Pneumopathie organisée	organizing pneumonia Masson bodies
+6	Vascularites	ch005	Granulomatose avec polyangéite (poumon)	granulomatosis with polyangiitis lung necrotizing vasculitis
+7	Infections	ch007	Aspergillose pulmonaire	aspergillosis invasive septate hyphae
+8	Infections	ch006	Tuberculose pulmonaire	mycobacterial tuberculosis caseating granuloma
+9	Transplantation	ch011	Rejet aigu du greffon pulmonaire	acute cellular rejection lung transplant perivascular grade
+10	Tumeurs épithéliales	ch013	Adénocarcinome pulmonaire	lung adenocarcinoma lepidic acinar papillary micropapillary solid
+11	Tumeurs épithéliales	ch013	Carcinome épidermoïde pulmonaire	squamous cell carcinoma lung keratinization p40
+12	Tumeurs neuroendocrines	ch014	Tumeur carcinoïde typique et atypique	typical atypical carcinoid mitoses necrosis
+13	Tumeurs neuroendocrines	ch014	Carcinome pulmonaire à petites cellules	small cell carcinoma lung crush artifact
+14	Lymphomes	ch012	Lymphome du MALT pulmonaire	MALT lymphoma lung marginal zone lymphoepithelial
+15	Métastases	ch016	Métastases pulmonaires	metastatic tumors to the lung immunohistochemistry
