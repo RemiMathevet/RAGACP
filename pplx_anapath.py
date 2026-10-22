@@ -21,6 +21,13 @@ MODELE = "perplexity-ai/pplx-embed-v2-context-9b-preview"
 FENETRE = 40000          # caractères par document (~10k tokens) ; moitié en cas d'OOM
 PAR_TRANCHE = 100        # documents par fichier de reprise
 _m = None
+SQL = ("SELECT rowid, source_short, coalesce(chapter_title,''), chunk_text FROM chunk_meta "
+       "ORDER BY source_short, rowid")
+# --base foeto : même encodeur, base et index fœto séparés (jamais mêlés à l'anapath) ; livres seulement
+FOETO = (Path.home() / "Bureau/foeto_base/syndromes_foetaux.db", Path.home() / "Bureau/foeto_base/pplx",
+         "SELECT rowid, source_id, '', chunk_text FROM chunk_meta WHERE source_type='book' "
+         "ORDER BY source_id, chunk_index, rowid")
+DB = ROOT / "anapath_rag.db"
 
 
 def modele(device="cuda"):
@@ -35,11 +42,10 @@ def modele(device="cuda"):
     return _m
 
 
-def documents(con):
+def documents(con, sql=None):
     """[(rowids, textes)] : un (livre, chapitre) découpé en fenêtres, ordre stable (reprise)."""
     docs, cle, cur = [], None, ([], [], 0)
-    for r, src, ch, t in con.execute("SELECT rowid, source_short, coalesce(chapter_title,''), chunk_text "
-                                     "FROM chunk_meta ORDER BY source_short, rowid"):
+    for r, src, ch, t in con.execute(sql or SQL):
         if (src, ch) != cle or cur[2] + len(t) > FENETRE:
             if cur[0]:
                 docs.append(cur[:2])
@@ -65,7 +71,7 @@ def encoder_doc(textes):
 
 def index(max_docs=None):
     OUT.mkdir(exist_ok=True)
-    docs = documents(sqlite3.connect(ROOT / "anapath_rag.db"))[:max_docs]
+    docs = documents(sqlite3.connect(f"file:{DB}?mode=ro", uri=True))[:max_docs]
     n_tr = (len(docs) + PAR_TRANCHE - 1) // PAR_TRANCHE
     print(f"{len(docs)} documents, {sum(len(d[0]) for d in docs)} passages, {n_tr} tranches", flush=True)
     t0, faits = time.time(), 0
@@ -159,5 +165,8 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("action", choices=["index", "eval"])
     ap.add_argument("--max-docs", type=int)
+    ap.add_argument("--base", choices=["acp", "foeto"], default="acp")
     a = ap.parse_args()
+    if a.base == "foeto":
+        DB, OUT, SQL = FOETO
     index(a.max_docs) if a.action == "index" else evaluer()

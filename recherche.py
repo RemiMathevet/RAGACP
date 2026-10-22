@@ -53,12 +53,40 @@ def _pplx():
     return _px
 
 
+def requetes_pplx(vs):
+    """Vecteurs pplx (normalisés) des requêtes ; sert aussi la fœto via servir_encodeur (un seul modèle sur la carte)."""
+    import torch
+    m = _pplx()[0]
+    with torch.inference_mode():
+        return np.asarray(m.encode_queries([[v] for v in vs], normalize_embeddings=True), dtype=np.float32).reshape(len(vs), -1)
+
+
+def servir_encodeur(port, verrou):
+    """POST {"q": [...]} -> {"E": [[...]]} sur 127.0.0.1 seulement (aucun tunnel ne pointe ce port). Client :
+    foetodata_hub/api/ask.py, dont la base et l'index restent dans foeto_base (jamais mêlés à l'anapath)."""
+    import json
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    class H(BaseHTTPRequestHandler):
+        def do_POST(self):
+            vs = [str(x)[:2000] for x in json.loads(self.rfile.read(int(self.headers["Content-Length"])))["q"][:8]]
+            with verrou:
+                E = requetes_pplx(vs)
+            b = json.dumps({"E": E.tolist()}).encode()
+            self.send_response(200); self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
+
+        def log_message(self, *a):
+            pass
+    ThreadingHTTPServer(("127.0.0.1", port), H).serve_forever()
+
+
 def dense_pplx(vs, k):
     """Par variante : [(rowid, distance cosinus)] des k plus proches."""
     import torch
     m, R, E = _pplx()
     with torch.inference_mode():
-        Q = np.asarray(m.encode_queries([[v] for v in vs], normalize_embeddings=True), dtype=np.float32).reshape(len(vs), -1)
+        Q = requetes_pplx(vs)
         sc, ix = torch.topk(torch.from_numpy(Q).to(E.device, E.dtype) @ E.T, k, dim=1)
     return [[(int(R[i]), 1 - float(c)) for c, i in zip(sl.tolist(), il.tolist())] for sl, il in zip(sc, ix)]
 _mod = None

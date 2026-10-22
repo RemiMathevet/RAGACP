@@ -399,4 +399,6 @@ if __name__ == "__main__":
     recherche.model()                                  # chargé au démarrage, pas à la 1re requête
     if recherche.DENSE == "pplx":
         recherche._pplx()                              # ~18 Go de RAM, CPU (ACP_PPLX_DEVICE) : chargé une fois
+        threading.Thread(target=recherche.servir_encodeur, daemon=True,   # requêtes du Demander fœto (data.pazuzu)
+                         args=(int(os.environ.get("ACP_PPLX_PORT", "5089")), verrou)).start()
     app.run("127.0.0.1", 5087, threaded=True)
