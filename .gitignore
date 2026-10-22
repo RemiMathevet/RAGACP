@@ -19,6 +19,7 @@
 !/fetch_librepathology.py
 !/extract_fiche.py
 !/figures_anapath.py
+!/embed_figures.py
 !/assemble_fiche.py
 !/comparer_fiches.py
 !/rejouer_tests.py

@@ -203,7 +203,7 @@ def page_fig(page, imgs, lines, blocks):
         for j, (img, _) in enumerate(ordre):
             l, meth = lettre_posee(img, lines), "lettre"
             if not l and len(ordre) > 1 and subs:
-                l, meth = "abcdefgh"[j], "ordre"
+                l, meth = ("abcdefghijklmnopqrstuvwxyz"[j] if j < 26 else str(j + 1)), "ordre"
             if not l and len(ordre) == 1 and len(subs) > 2:          # une image, plusieurs sous-légendes
                 out.append((img, cap and cap["fig"], "*", cap["texte"], None, None, "incruste"))
                 continue
@@ -261,6 +261,9 @@ if __name__ == "__main__":
     con = sqlite3.connect(DB)
     con.executescript(SCHEMA.replace("UNIQUE(pdf", "xref INT, UNIQUE(pdf"))
     pg = tuple(int(x) for x in a.pages.split("-")) if a.pages else None
+    faits = {r[0] for r in con.execute("SELECT DISTINCT pdf FROM figures")} if not a.pages else set()
     for pdf, livre in sorted(livres_pdf(rag).items()):
+        if pdf in faits:                                  # reprise après arrêt : livre déjà extrait
+            continue
         if a.livre.lower() in pdf.lower() and (ROOT / "livres" / pdf).exists():
             print(f"{livre:45s} {traiter(ROOT / 'livres' / pdf, livre, con, pg)} panneaux", flush=True)
