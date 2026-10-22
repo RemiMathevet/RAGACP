@@ -21,7 +21,19 @@ CACHE = ROOT / "refs" / "mesh_termes_M.npz"
 # pplx/gold.tsv : 4 premiers passages 18/20 contre 10-11/20, MRR 0,86 contre 0,32 (requêtes EN). BioLORD reste
 # pour l'expansion MeSH et le rejet des requêtes trop proches.
 DENSE = os.environ.get("ACP_DENSE", "biolord")
-PPLX_DEVICE = os.environ.get("ACP_PPLX_DEVICE", "cpu")     # cpu : laisse la 3090 à Magos/Qwen (autres projets)
+# cpu | cuda | auto (cuda s'il reste ≥ 19 Go libres, sinon cpu). Rythme fixé par acp_mode.sh : jour = auto (Qwen
+# arrêté à 8 h), nuit = cpu (carte rendue à Magos/Qwen). Décidé AVANT tout import de fla (noyaux GPU seulement).
+PPLX_DEVICE = os.environ.get("ACP_PPLX_DEVICE", "cpu")
+
+
+def _device():
+    if PPLX_DEVICE != "auto":
+        return PPLX_DEVICE
+    try:
+        import torch
+        return "cuda" if torch.cuda.is_available() and torch.cuda.mem_get_info()[0] >= 19e9 else "cpu"
+    except Exception:
+        return "cpu"
 _px = None
 
 
@@ -29,13 +41,15 @@ def _pplx():
     """(modèle, rowids, matrice GPU float16 normalisée) ; chargé une fois. Index = pplx/tranche_*.npz."""
     global _px
     if _px is None:
-        if PPLX_DEVICE == "cpu":
+        dev = _device()
+        print(f"pplx sur {dev}", flush=True)
+        if dev == "cpu":
             import sys
             sys.modules.setdefault("fla", None)    # noyaux Triton = GPU seulement : repli PyTorch, utilisable sur CPU
         import torch, pplx_anapath as p
         R, E = p.charger()
-        dt = torch.float16 if PPLX_DEVICE == "cuda" else torch.float32
-        _px = (p.modele(PPLX_DEVICE), R, torch.from_numpy(E).to(PPLX_DEVICE, dt))
+        dt = torch.float16 if dev == "cuda" else torch.float32
+        _px = (p.modele(dev), R, torch.from_numpy(E).to(dev, dt))
     return _px
 
 
