@@ -397,4 +397,6 @@ def api_ask_get(aid):
 
 if __name__ == "__main__":
     recherche.model()                                  # chargé au démarrage, pas à la 1re requête
+    if recherche.DENSE == "pplx":
+        recherche._pplx()                              # ~18 Go de RAM, CPU (ACP_PPLX_DEVICE) : chargé une fois
     app.run("127.0.0.1", 5087, threaded=True)

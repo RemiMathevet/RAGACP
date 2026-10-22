@@ -23,13 +23,13 @@ PAR_TRANCHE = 100        # documents par fichier de reprise
 _m = None
 
 
-def modele():
+def modele(device="cuda"):
     global _m
     if _m is None:
         import torch
         from transformers import AutoModel
         from transformers import AutoTokenizer
-        _m = AutoModel.from_pretrained(MODELE, trust_remote_code=True, dtype=torch.bfloat16).to("cuda").eval()
+        _m = AutoModel.from_pretrained(MODELE, trust_remote_code=True, dtype=torch.bfloat16).to(device).eval()
         # la propriété tokenizer du code distant échoue (AttributeError masqué par nn.Module) : on le fournit
         _m.tokenizer = AutoTokenizer.from_pretrained(MODELE, trust_remote_code=True, padding_side="right")
     return _m

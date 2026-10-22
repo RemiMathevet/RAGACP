@@ -10,13 +10,43 @@
    Fusion par rang réciproque (RRF). --brut : la question seule, pour comparer.
 Cours pondérés 0,8 face au livre ; la page imprimée vient de chunk_pages.
 """
-import argparse, sqlite3, struct
+import argparse, os, sqlite3, struct
 from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parent
 MODEL = "FremyCompany/BioLORD-2023-M"
 CACHE = ROOT / "refs" / "mesh_termes_M.npz"
+# canal dense : biolord (défaut, CPU) ou pplx (pplx-embed-v2-context, GPU ~18 Go, venv ~/venvs/pplx) ; 22/10 sur
+# pplx/gold.tsv : 4 premiers passages 18/20 contre 10-11/20, MRR 0,86 contre 0,32 (requêtes EN). BioLORD reste
+# pour l'expansion MeSH et le rejet des requêtes trop proches.
+DENSE = os.environ.get("ACP_DENSE", "biolord")
+PPLX_DEVICE = os.environ.get("ACP_PPLX_DEVICE", "cpu")     # cpu : laisse la 3090 à Magos/Qwen (autres projets)
+_px = None
+
+
+def _pplx():
+    """(modèle, rowids, matrice GPU float16 normalisée) ; chargé une fois. Index = pplx/tranche_*.npz."""
+    global _px
+    if _px is None:
+        if PPLX_DEVICE == "cpu":
+            import sys
+            sys.modules.setdefault("fla", None)    # noyaux Triton = GPU seulement : repli PyTorch, utilisable sur CPU
+        import torch, pplx_anapath as p
+        R, E = p.charger()
+        dt = torch.float16 if PPLX_DEVICE == "cuda" else torch.float32
+        _px = (p.modele(PPLX_DEVICE), R, torch.from_numpy(E).to(PPLX_DEVICE, dt))
+    return _px
+
+
+def dense_pplx(vs, k):
+    """Par variante : [(rowid, distance cosinus)] des k plus proches."""
+    import torch
+    m, R, E = _pplx()
+    with torch.inference_mode():
+        Q = np.asarray(m.encode_queries([[v] for v in vs], normalize_embeddings=True), dtype=np.float32).reshape(len(vs), -1)
+        sc, ix = torch.topk(torch.from_numpy(Q).to(E.device, E.dtype) @ E.T, k, dim=1)
+    return [[(int(R[i]), 1 - float(c)) for c, i in zip(sl.tolist(), il.tolist())] for sl, il in zip(sc, ix)]
 _mod = None
 
 
@@ -64,13 +94,16 @@ def search(q, k=8, brut=False, livre=None):
     tc = sqlite3.connect(ROOT / "anapath_terms.db")
     hit, var = ([], [q]) if brut else expand(q, tc)
     rang = {}
-    vecs = enc(var)
     best = {}
     # ponytail: filtre livre = KNN élargi à 400 puis filtré ; partition sqlite-vec si un livre rate ses passages
     permis = {r for (r,) in rc.execute("SELECT rowid FROM chunk_meta WHERE source_short=?", (livre,))} if livre else None
-    for v in vecs:
-        for r, d in rc.execute(f"SELECT rowid, distance FROM vec_chunks WHERE embedding MATCH ? AND k={400 if livre else 40}",
-                               (struct.pack(f"{len(v)}f", *v),)):
+    if DENSE == "pplx":
+        listes = dense_pplx([q], 400 if livre else 40)   # requête seule (~3-8 s CPU) ; les variantes MeSH vont au BM25
+    else:
+        listes = [rc.execute(f"SELECT rowid, distance FROM vec_chunks WHERE embedding MATCH ? AND k={400 if livre else 40}",
+                             (struct.pack(f"{len(v)}f", *v),)).fetchall() for v in enc(var)]
+    for lst in listes:
+        for r, d in lst:
             if permis is None or r in permis:
                 best[r] = min(d, best.get(r, 9))
     for i, r in enumerate(sorted(best, key=best.get)):
