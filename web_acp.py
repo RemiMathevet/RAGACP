@@ -188,7 +188,7 @@ def slug_fiche(f):
 
 
 def liens_fiches():
-    return "".join(f"<li><a href='/fiche/{slug_fiche(f)}'>{escape(titre_fiche(f))}</a></li>"
+    return "".join(f"<li><a href='/fiche/{slug_fiche(f)}'>{escape(titre_fiche(f).split(" — ", 1)[-1])}</a></li>"
                    for f in sorted((ROOT / "fiches").glob("fiche_*.md")))
 
 
