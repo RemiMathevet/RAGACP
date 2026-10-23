@@ -176,18 +176,27 @@ def methode():
     return page("Méthode", markdown.markdown((ROOT / "METHODE.md").read_text(encoding="utf-8")) + ouvrages())
 
 
+def titre_fiche(f):
+    """« 5.DIG.1 — Tube digestif, biopsies muqueuses » : 1re ligne du .md (assemble_fiche), sans la mention du modèle."""
+    t = f.open(encoding="utf-8").readline().removeprefix("# FICHE ").strip()
+    return re.sub(r"\s*\([^)]*\)$", "", t) or f.stem
+
+
+def liens_fiches():
+    return "".join(f"<li><a href='/fiche/{f.stem}'>{escape(titre_fiche(f))}</a></li>"
+                   for f in sorted((ROOT / "fiches").glob("fiche_*.md")))
+
+
 @app.get("/fiches")
 def fiches():
-    liste = "".join(f"<li><a href='/fiche/{f.stem}'>{escape(f.stem)}</a></li>"
-                    for f in sorted((ROOT / "fiches").glob("fiche_*.md")))
+    liste = liens_fiches()
     return page("Fiches", f"<h3>Fiches</h3><ul>{liste or '<li>aucune pour l’instant</li>'}</ul>")
 
 
 @app.get("/recherche")         # ponytail: plus dans le menu (demande du 22/10), gardée pour l'usage direct
 def accueil():
     q = request.args.get("q", "").strip()
-    fiches = "".join(f"<li><a href='/fiche/{f.stem}'>{escape(f.stem)}</a></li>"
-                     for f in sorted((ROOT / "fiches").glob("fiche_*.md")))
+    fiches = liens_fiches()
     corps = (f"<form><input type=search name=q value='{escape(q)}' placeholder='ex. hyalinose segmentaire et focale' autofocus></form>"
              f"<p class=m>Recherche FR ou EN, élargie par MeSH. Bord rouge = livre, bord jaune = cours (preuve inférieure).</p>")
     if q:
@@ -209,7 +218,7 @@ def fiche(nom):
     f = ROOT / "fiches" / f"{nom}.md"
     if not (f.name.startswith("fiche_") and f.is_file() and f.parent == ROOT / "fiches"):
         abort(404)
-    return page(nom, markdown.markdown(f.read_text(encoding="utf-8"), extensions=["tables"]))
+    return page(titre_fiche(f), markdown.markdown(f.read_text(encoding="utf-8"), extensions=["tables"]))
 
 
 ASKS = {}       # ponytail: en mémoire, perdu au redémarrage
