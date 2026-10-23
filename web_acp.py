@@ -182,8 +182,13 @@ def titre_fiche(f):
     return re.sub(r"\s*\([^)]*\)$", "", t) or f.stem
 
 
+def slug_fiche(f):
+    """fiche_5DIG1_digestif.md -> « digestif », fiche_5F1_foie_biopsie.md -> « foie-biopsie » (adresse lisible)."""
+    return f.stem.split("_", 2)[2].replace("_", "-")
+
+
 def liens_fiches():
-    return "".join(f"<li><a href='/fiche/{f.stem}'>{escape(titre_fiche(f))}</a></li>"
+    return "".join(f"<li><a href='/fiche/{slug_fiche(f)}'>{escape(titre_fiche(f))}</a></li>"
                    for f in sorted((ROOT / "fiches").glob("fiche_*.md")))
 
 
@@ -215,8 +220,13 @@ def accueil():
 
 @app.get("/fiche/<nom>")
 def fiche(nom):
-    f = ROOT / "fiches" / f"{nom}.md"
-    if not (f.name.startswith("fiche_") and f.is_file() and f.parent == ROOT / "fiches"):
+    if nom.startswith("fiche_"):                 # anciennes adresses (fiche_5DIG1_digestif) : redirigées
+        f = ROOT / "fiches" / f"{nom}.md"
+        if f.is_file() and f.parent == ROOT / "fiches":
+            return redirect(f"/fiche/{slug_fiche(f)}", 301)
+        abort(404)
+    f = next((f for f in (ROOT / "fiches").glob("fiche_*.md") if slug_fiche(f) == nom), None)
+    if not f:
         abort(404)
     return page(titre_fiche(f), markdown.markdown(f.read_text(encoding="utf-8"), extensions=["tables"]))
 
