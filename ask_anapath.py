@@ -348,8 +348,7 @@ def run(ask, verrou):
             ask["answer_raw"] = "(aucune réponse)"
         d = parse_json(ask["answer_raw"])
         if isinstance(d, dict) and isinstance(d.get("elements"), list):
-            ask["answer_html"], ask["passages"] = rendre(d, shown, ask["q"], rendus, juge=lambda *x: juger(*x, trace=ask.setdefault("cot", [])),
-                topo=(lambda q, g: rediger_topo(q, g, trace=ask.setdefault("cot", []))) if TOPO else None)
+            ask["answer_html"], ask["passages"] = rendre(d, shown, ask["q"], rendus, juge=lambda *x: juger(*x, trace=ask.setdefault("cot", [])))
             ask["_gardes"] = d.get("_gardes", [])
         else:                                       # pas de JSON lisible : ancien contrôle sur le texte libre
             ask["answer_html"], ask["passages"] = verify(ask["answer_raw"], shown, ask["q"], rendus)
@@ -508,54 +507,7 @@ def juger(synthese, gardes, shown, trace=None):
         return {}
 
 
-TOPO = os.environ.get("ACP_TOPO", "1") == "1"   # topo rédigé + relu : TEST TRANSITOIRE (23/10), ACP_TOPO=0 pour couper
-TOPO_SYS = """Tu rédiges un court topo de pathologiste (3 à 6 phrases, en français) qui répond à la question, à partir
-des SEULS éléments vérifiés fournis. Interdits : tout fait, chiffre, nom ou nuance absent des éléments ; tout
-renforcement (« toujours », « pathognomonique », « critère » si l'élément ne le dit pas). Chaque phrase se termine par
-le ou les renvois [#n] des éléments qu'elle utilise. Un élément marqué PARTIEL se reprend prudemment. Organise :
-définition / aspect, puis confirmation (IHC, moléculaire), puis pièges ou différentiel s'il y en a. Réponds par le
-topo seul, sans titre ni liste."""
-
-
-def rediger_topo(question, gardes, trace=None):
-    els = "\n".join(f"[#{n}] {fr}{' (PARTIEL : ' + '; '.join(notes) + ')' if notes else ''}\n   « {v} »"
-                     for fr, v, n, notes in gardes)
-    out = _magos(f"QUESTION : {question}\n\nÉLÉMENTS VÉRIFIÉS :\n{els}\n\nTOPO :", system=TOPO_SYS, model=MODEL,
-                 trace=trace, etape="topo")
-    return " ".join(out.split()).removeprefix("TOPO :").strip()
-
-
-def _topo_html(question, gardes, shown, juge, topo):
-    """Topo rédigé par le modèle puis relu (élément 0 du relecteur) ; repli : les éléments mis bout à bout."""
-    brut = " ".join(f'{html.escape(fr.rstrip(". "))}{" ◐" if notes else ""} <a href="#p{n}">[#{n}]</a>.'
-                    for fr, v, n, notes in gardes)
-    t, avis = None, ""
-    if topo and juge:
-        try:
-            t = topo(question, gardes)
-        except Exception as e:
-            avis = f"rédaction impossible ({str(e)[:80]}) — éléments bout à bout"
-    if t:
-        ns = {n for _, _, n, _ in gardes}
-        bad = sorted({int(x) for x in re.findall(r"\[#(\d+)\]", t)} - ns)
-        appui = _norm(" ".join(fr + " " + v for fr, v, _, _ in gardes) + " " + question)
-        nums = sorted({x for x in _NUM.findall(t) if _norm(x) not in appui.split()})
-        vd, pq = juge(t, gardes, shown).get(0, ("", "relecteur indisponible"))
-        if bad or nums or vd in ("C", "H", ""):
-            avis = ("topo rédigé écarté : " + "; ".join(filter(None, [
-                f"renvois inconnus {bad}" if bad else "", f"chiffres absents des éléments {nums}" if nums else "",
-                f"relecteur {vd or '?'} — {pq}" if vd != "S" and vd != "P" else ""])) + " — éléments bout à bout")
-        else:
-            corps = re.sub(r"\[#(\d+)\]", r'<a href="#p\1">[#\1]</a>', html.escape(t))
-            note = "relu : soutenu" if vd == "S" else f"relu : ⚠ en partie seulement — {html.escape(pq)}"
-            return (f'<details class="topo"><summary><b>Synthèse</b> <span class="m">— rédigée par {MODEL}, {note} '
-                    f'(test)</span></summary><p>{corps}</p></details>')
-    return (f'<details class="topo"><summary><b>Synthèse</b> <span class="m">— '
-            f'{html.escape(avis) if avis else "les éléments vérifiés, en un paragraphe"} ; ◐ = soutien partiel</span>'
-            f'</summary><p>{brut}</p></details>')
-
-
-def rendre(d, shown, question="", rendus=None, juge=None, topo=None):
+def rendre(d, shown, question="", rendus=None, juge=None):
     """Réponse JSON : chaque élément vérifié. Vert = verbatim dans le passage n ; orange = dans un autre passage
     (n corrigé) ; sinon RETIRÉ (liste repliée). Chiffre ou code ADICAP de « fr » absent du verbatim : élément signalé."""
     gardes, retires, cited = [], [], {}
@@ -609,7 +561,12 @@ def rendre(d, shown, question="", rendus=None, juge=None, topo=None):
     h = [("" if not syn else f"<p><b>{syn}</b></p>" if not avis else
           f'<details><summary class="m">⚠ synthèse {html.escape(avis)} — repliée, lire les éléments</summary><p>{syn}</p></details>')]
     if gardes:
-        h.append(_topo_html(question, gardes, shown, juge, topo))
+        # topo replié : les seuls éléments gardés (verbatim retrouvé + relus), mis bout à bout en paragraphe ;
+        # ponytail: aucun texte nouveau, donc rien à re-vérifier ; une rédaction LLM demanderait une 2e relecture
+        topo = " ".join(f'{html.escape(fr.rstrip(". "))}{" ◐" if notes else ""} <a href="#p{n}">[#{n}]</a>.'
+                        for fr, v, n, notes in gardes)
+        h.append(f'<details class="topo"><summary><b>Synthèse</b> <span class="m">— les éléments vérifiés, '
+                 f'en un paragraphe ; ◐ = soutien partiel</span></summary><p>{topo}</p></details>')
         h.append("<ul>")
         for fr, v, n, notes in gardes:
             cls = "cit-warn" if notes else "cit-ok"
@@ -728,15 +685,6 @@ if __name__ == "__main__":
     assert p[0]["n"] == 7 and "<mark" in p[0]["html"] and "&lt;" not in h
     par = {"_hist": ["Q1"], "_gardes": [("villite", "chronic villitis", 7, [])], "_shown": shown}
     assert "[#7]" in suite(par) and "chronic villitis" in suite(par) and "Question 1 : Q1" in suite(par)
-    el = {"elements": [{"fr": "villite chronique", "verbatim": "chronic villitis", "n": 7}]}
-    jS = lambda *x: {0: ("S", ""), 1: ("S", "")}
-    ht, _ = rendre(dict(el), shown, "villite ?", juge=jS, topo=lambda q, g: "Villite chronique [#7].")
-    assert "rédigée par" in ht and 'href="#p7">[#7]' in ht, ht
-    ht, _ = rendre(dict(el), shown, "villite ?", juge=jS, topo=lambda q, g: "Villite dans 40 % des cas [#9].")
-    assert "topo rédigé écarté" in ht and "[9]" in ht and "40" in ht, ht            # renvoi et chiffre inventés
-    ht, _ = rendre(dict(el), shown, "villite ?", juge=lambda *x: {0: ("H", "autre entité"), 1: ("S", "")},
-                   topo=lambda q, g: "Villite chronique [#7].")
-    assert "topo rédigé écarté" in ht and "relecteur H" in ht, ht
     hd, _ = rendre({"elements": [{"fr": "villite", "verbatim": "chronic villitis", "n": 7, "dd": "VUE", "sens": "pour"}]}, shown)
     assert "VUE — pour : villite" in hd, hd
     for bon in ["Sarcome CIC t(4;19)(q35;q13), WT1 positif : DSRCT ?", "Gleason 3+4=7, grade group 2 ; OMS 2021 ; pT2N0",
