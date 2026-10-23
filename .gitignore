@@ -18,6 +18,7 @@
 !/build_terms.py
 !/fetch_librepathology.py
 !/extract_fiche.py
+!/fiches_db.py
 !/figures_anapath.py
 !/embed_figures.py
 !/assemble_fiche.py

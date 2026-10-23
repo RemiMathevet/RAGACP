@@ -4,7 +4,7 @@
     python acp_paquet.py
 
 Contenu : anapath_rag.db (passages, vecteurs BioLORD-2023-M, FTS, pages imprimées, éditions), anapath_terms.db
-(ADICAP + MeSH), fiches/*.md et leurs JSON (éléments avec verbatim et source). Jamais ask_log.db (questions posées).
+(ADICAP + MeSH), anapath_fiches.db (fiches : source de vérité depuis le 23/10) et fiches/*.md. Jamais ask_log.db (questions posées).
 Copie cohérente des bases par l'API backup de SQLite (le site peut lire pendant ce temps). Servi par web_acp.py
 sur /dl/<jeton> (acp_tokens.py), un jeton = un téléchargement. Les anciens paquets sont supprimés.
 """
@@ -18,7 +18,9 @@ LISEZMOI = """RAGACP — paquet de données (usage personnel, non commercial, no
 anapath_rag.db    passages de livres et de cours (texte), vecteurs BioLORD-2023-M (sqlite-vec), index FTS5,
                   pages imprimées (chunk_pages), éditions et années (source_info)
 anapath_terms.db  ADICAP 2024 (ANS) + MeSH FR/EN (Wikidata, CC0) et leur jointure
-fiches/           fiches de synthèse (.md) et éléments vérifiés (.json : phrase, verbatim, source, page)
+anapath_fiches.db fiches en base : entités et éléments vérifiés (phrase, verbatim, source, page, statut),
+                  index FTS5 ; vue v_elements pour les requêtes
+fiches/           fiches de synthèse (.md), lisibles telles quelles
 
 Les passages sont des extraits d'ouvrages sous droits d'auteur de leurs éditeurs : usage personnel de
 consultation seulement, ne pas redistribuer. Libre Pathology : CC BY-NC-SA 4.0 (attribution, pas d'usage
@@ -32,13 +34,13 @@ def construire():
     sortie = DIST / time.strftime("ragacp_%Y%m%d.zip")
     tmp = sortie.with_suffix(".part")
     with tempfile.TemporaryDirectory(dir=DIST) as d, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
-        for nom in ("anapath_rag.db", "anapath_terms.db"):
+        for nom in ("anapath_rag.db", "anapath_terms.db", "anapath_fiches.db"):
             copie = Path(d) / nom
             src, dst = sqlite3.connect(ROOT / nom), sqlite3.connect(copie)
             src.backup(dst); dst.close(); src.close()
             z.write(copie, nom)
         for f in sorted((ROOT / "fiches").rglob("*")):
-            if f.is_file() and f.suffix in (".md", ".json", ".tsv"):
+            if f.is_file() and f.suffix == ".md":
                 z.write(f, f.relative_to(ROOT))
         z.writestr("LISEZMOI.txt", LISEZMOI)
     tmp.rename(sortie)

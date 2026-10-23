@@ -110,7 +110,10 @@ def _magos(prompt, timeout_s=900, system=None, model=None, trace=None, etape="")
                            {"role": "user", "content": prompt}], "temperature": 0.3, "max_tokens": 16000}
                           | ({"reasoning_effort": "high"} if THINK and LLM == "albert" and not model else {})).encode()
         url, h = "http://127.0.0.1:8090/v1/chat/completions", {"Content-Type": "application/json"}
-        if LLM == "albert":
+        if model and "/" in model:              # id OpenRouter (« nvidia/… ») : relecteur gratuit à l'essai, 22/10
+            url = "https://openrouter.ai/api/v1/chat/completions"
+            h["Authorization"] = "Bearer " + os.environ["OPENROUTER_API_KEY"]
+        elif LLM == "albert":
             url = "https://albert.api.etalab.gouv.fr/v1/chat/completions"
             h["Authorization"] = "Bearer " + open(os.path.expanduser("~/.config/albert.key")).read().strip()
         for essai in range(8):                  # Albert : 10 requêtes/minute par modèle -> HTTP 429, on attend
