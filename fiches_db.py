@@ -11,7 +11,8 @@ Les JSON d'extract_fiche.py ne sont plus qu'une archive d'extraction ; assemble_
 Rien ne s'efface : une correction retire l'ancienne ligne (statut 'remplace', remplace_par = nouvelle) ; un
 rejet de l'extraction est gardé en statut 'rejete'. Un verbatim saisi à la main doit se trouver dans le livre
 cité (anapath_rag.db), sinon refus (--force pour passer outre, marqué). Ré-importer un organe remplace les seules
-lignes d'extraction : les corrections à la main restent actives.
+lignes d'extraction : les corrections à la main restent actives. corrige / retire / ajoute réassemblent la fiche
+.md touchée (servie telle quelle par acp.adeptus).
 """
 import argparse, json, sqlite3, sys, time
 from pathlib import Path
@@ -156,6 +157,15 @@ def corriger(con, eid, auteur, force=False, **champs):
     return nid
 
 
+def reassembler(con, eid):
+    """La fiche .md (lue par acp.adeptus à chaque visite) suit la base : réassemblée après chaque modification."""
+    import subprocess
+    code, dossier = con.execute("""SELECT f.code, f.dossier FROM elements e JOIN entites n ON n.id = e.entite_id
+                                   JOIN fiches f ON f.code = n.fiche WHERE e.id=?""", (eid,)).fetchone()
+    subprocess.run([sys.executable, str(ROOT / "assemble_fiche.py"), code,
+                    str(ROOT / "fiches" / f"fiche_{code}_{dossier}.md")], cwd=ROOT, check=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
@@ -195,12 +205,15 @@ def main():
             print(f"#{r[0]} {r[1]}.{r[2]} {r[3]} · {r[4]}{'' if r[5] == 'actif' else ' [' + r[5] + ']'}\n"
                   f"   {r[6]}\n   « {' '.join(r[7].split())[:300]} » [{r[8]}, p. {r[9]}]")
     elif a.cmd == "corrige":
-        print("nouvel élément", corriger(con, a.id, a.auteur, a.force, fr=a.fr, verbatim=a.verbatim,
-                                         source=a.source, page=a.page))
+        nid = corriger(con, a.id, a.auteur, a.force, fr=a.fr, verbatim=a.verbatim, source=a.source, page=a.page)
+        print("nouvel élément", nid)
+        reassembler(con, nid)
     elif a.cmd == "retire":
         n = con.execute("UPDATE elements SET statut='retire', motif=?, auteur=?, maj=? WHERE id=? AND statut='actif'",
                         (a.motif, a.auteur, maintenant(), a.id)).rowcount
         con.commit(); print("retiré" if n else f"élément {a.id} introuvable ou pas actif")
+        if n:
+            reassembler(con, a.id)
     elif a.cmd == "ajoute":
         motif, ty = None, dans_le_livre(a.source, a.verbatim)
         if not ty:
@@ -211,8 +224,9 @@ def main():
                             (a.entite_id, a.champ)).fetchone()[0]
         row = _ligne({"fr": a.fr, "verbatim": a.verbatim, "source": a.source, "page": a.page, "type": ty or "book"},
                      motif=motif)
-        print("nouvel élément", inserer(con, a.entite_id, a.champ, ordre, row, a.auteur, maintenant()))
-        con.commit()
+        nid = inserer(con, a.entite_id, a.champ, ordre, row, a.auteur, maintenant())
+        con.commit(); print("nouvel élément", nid)
+        reassembler(con, nid)
 
 
 def autotest():
