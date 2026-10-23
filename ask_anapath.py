@@ -561,6 +561,12 @@ def rendre(d, shown, question="", rendus=None, juge=None):
     h = [("" if not syn else f"<p><b>{syn}</b></p>" if not avis else
           f'<details><summary class="m">⚠ synthèse {html.escape(avis)} — repliée, lire les éléments</summary><p>{syn}</p></details>')]
     if gardes:
+        # topo replié : les seuls éléments gardés (verbatim retrouvé + relus), mis bout à bout en paragraphe ;
+        # ponytail: aucun texte nouveau, donc rien à re-vérifier ; une rédaction LLM demanderait une 2e relecture
+        topo = " ".join(f'{html.escape(fr.rstrip(". "))}{" ◐" if notes else ""} <a href="#p{n}">[#{n}]</a>.'
+                        for fr, v, n, notes in gardes)
+        h.append(f'<details class="topo"><summary><b>Synthèse</b> <span class="m">— les éléments vérifiés, '
+                 f'en un paragraphe ; ◐ = soutien partiel</span></summary><p>{topo}</p></details>')
         h.append("<ul>")
         for fr, v, n, notes in gardes:
             cls = "cit-warn" if notes else "cit-ok"
@@ -666,7 +672,7 @@ if __name__ == "__main__":
         {"fr": "dans 12 cas", "verbatim": "with lymphocytes", "n": 7},
         {"fr": "inventé", "verbatim": "acute villitis", "n": 7}]}, shown)
     assert hj.count('"cit-ok"') == 1 and hj.count('"cit-warn"') == 1 and "1 élément(s) retiré(s)" in hj and "chiffre non sourcé : 12" in hj, hj
-    assert pj[0]["n"] == 7 and "synthèse non vérifiée" in hj
+    assert 'class="topo"' in hj and pj[0]["n"] == 7 and "synthèse non vérifiée" in hj
     hk, _ = rendre({"synthese": "S", "elements": [
         {"fr": "villite chronique", "verbatim": "chronic villitis of unknown etiology", "n": 7},
         {"fr": "lymphocytes absents", "verbatim": "with lymphocytes", "n": 7}]}, shown,
