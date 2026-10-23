@@ -9,7 +9,7 @@ un autre encodeur s'ajoute à côté sans rien écraser. Banc livre <-> web (PRE
 de bonne entité, D4v2 / DINOv2 au hasard. Vue = image entière, petit côté ramené à 224 px, centre 224×224.
 Reprend là où il s'est arrêté (figures déjà encodées pour ce modèle sautées).
 """
-import argparse, sqlite3, sys
+import argparse, sqlite3
 from pathlib import Path
 import numpy as np
 import torch
@@ -17,11 +17,21 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent
 DB = ROOT / "anapath_figures.db"
-sys.path.insert(0, "/home/mathevet/Bureau/FoetoPath_Luminarium_V2/Lumi/embeddings")
-import embed_multimag as em  # noqa: E402
 
-CHARGEURS = {"uni2": em.load_uni2}
-MEAN, STD = torch.tensor(em.IMAGENET_MEAN).view(3, 1, 1), torch.tensor(em.IMAGENET_STD).view(3, 1, 1)
+
+def load_uni2(device="cuda"):
+    """UNI2-h (ViT-H/14, 1536 d) par timm ; accès HF accordé par MahmoodLab (licence CC BY-NC-ND)."""
+    import timm, timm.layers
+    return timm.create_model(
+        "hf-hub:MahmoodLab/UNI2-h", pretrained=True, img_size=224, patch_size=14, depth=24, num_heads=24,
+        init_values=1e-5, embed_dim=1536, mlp_ratio=2.66667 * 2, num_classes=0, no_embed_class=True,
+        dynamic_img_size=True, reg_tokens=8, mlp_layer=timm.layers.SwiGLUPacked, act_layer=torch.nn.SiLU,
+    ).to(device).eval()
+
+
+CHARGEURS = {"uni2": load_uni2}
+MEAN = torch.tensor((0.485, 0.456, 0.406)).view(3, 1, 1)
+STD = torch.tensor((0.229, 0.224, 0.225)).view(3, 1, 1)
 
 
 def ouvrir(p):
@@ -73,7 +83,7 @@ def main():
         for j in np.argsort(-s)[:a.k]:
             r = con.execute("SELECT livre, page_label, figure, panneau, coalesce(sous_legende, legende), fichier "
                             "FROM figures WHERE id=?", (ids[j],)).fetchone()
-            print(f"{s[j]:.3f}  {r[0]} p.{r[1]} fig.{r[2]}{r[3] or ''}  {(r[4] or '')[:90]}  [{r[5]}]")
+            print(f"{s[j]:.3f}  {r[0]} p.{r[1]} fig.{r[2] or ''}{r[3] or ''}  {(r[4] or '')[:90]}  [{r[5]}]")
         return
     todo = con.execute("SELECT f.id, f.fichier FROM figures f WHERE NOT EXISTS (SELECT 1 FROM figures_vec v "
                        "WHERE v.id=f.id AND v.modele=?) ORDER BY f.id", (a.modele,)).fetchall()
