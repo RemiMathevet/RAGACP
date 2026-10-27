@@ -15,7 +15,10 @@ LOG = recherche.ROOT / "ask_log.db"
 
 MAGOS_URL = "http://127.0.0.1:8200"
 LLM = os.environ.get("ACP_LLM", "qwen")          # « deepseek » : llama-server DeepSeek-V4-Flash sur :8090, hors Magos
-MODEL = {"deepseek": "DeepSeek-V4-Flash", "albert": "deepseek-v4-flash-0731"}.get(LLM, "Qwen3.6-35B-direct")
+# openrouter : même famille de modèles chez OpenRouter, fournisseurs qui ne conservent pas les requêtes (data_collection
+# deny) ; modèle figé par ACP_OR_MODELE ; clé dans ~/.config/openrouter.key. Sert aussi de REPLI quand Albert tombe.
+OR_MODELE = os.environ.get("ACP_OR_MODELE", "deepseek/deepseek-v4-flash-0731")   # = le modèle servi par Albert
+MODEL = {"deepseek": "DeepSeek-V4-Flash", "albert": "deepseek-v4-flash-0731", "openrouter": OR_MODELE}.get(LLM, "Qwen3.6-35B-direct")
 # albert : API Albert (DINUM), questions sans donnée patient (filtre_question) ; clé dans ~/.config/albert.key
 MAX_ROUNDS = 4
 HITS_PER_SEARCH = 4
@@ -104,8 +107,18 @@ JUGE_MODEL = os.environ.get("ACP_JUGE", "gpt-oss-120b" if LLM == "albert" else "
 THINK = os.environ.get("ACP_THINK") == "1"       # Albert : mode réflexion de DeepSeek (raisonnement renvoyé = COT du bench)
 
 
+def _openrouter(body, model):
+    """Requête au format OpenRouter : modèle figé, fournisseurs sans conservation des requêtes, réflexion traduite."""
+    b = json.loads(body)
+    b["model"] = model if model and "/" in model else OR_MODELE
+    b["provider"] = {"data_collection": "deny"}
+    if b.pop("reasoning_effort", None) or (THINK and not model):
+        b["reasoning"] = {"effort": "high"}
+    return "https://openrouter.ai/api/v1/chat/completions", json.dumps(b).encode()
+
+
 def _magos(prompt, timeout_s=900, system=None, model=None, trace=None, etape=""):
-    if LLM in ("deepseek", "albert"):           # local : 13 tok/s, prefill ~95 tok/s, réservé aux essais de nuit
+    if LLM in ("deepseek", "albert", "openrouter"):   # deepseek local : 13 tok/s, prefill ~95 tok/s, essais de nuit
         body = json.dumps({"model": model or MODEL, "messages": [{"role": "system", "content": system or _system()},
                            {"role": "user", "content": prompt}], "temperature": 0.3, "max_tokens": 16000}
                           | ({"reasoning_effort": "high"} if THINK and LLM == "albert" and not model else {})).encode()
@@ -116,15 +129,29 @@ def _magos(prompt, timeout_s=900, system=None, model=None, trace=None, etape="")
         elif LLM == "albert":
             url = "https://albert.api.etalab.gouv.fr/v1/chat/completions"
             h["Authorization"] = "Bearer " + open(os.path.expanduser("~/.config/albert.key")).read().strip()
+        elif LLM == "openrouter":
+            url, body = _openrouter(body, model)
+            h["Authorization"] = "Bearer " + open(os.path.expanduser("~/.config/openrouter.key")).read().strip()
+        r = None
         for essai in range(8):                  # Albert : 10 requêtes/minute par modèle -> HTTP 429, on attend
             try:
                 r = json.load(urllib.request.urlopen(urllib.request.Request(url, body, h), timeout=3600))
                 break
-            except urllib.error.HTTPError as e:
-                corps = e.read().decode(errors="replace") if e.code == 429 else ""
-                # passerelle Albert coupée (504, 4 questions du bench du 22/10) : UNE seconde tentative
-                if e.code in (502, 503, 504) and essai == 0:
-                    continue
+            except (urllib.error.HTTPError, urllib.error.URLError) as e:
+                code = getattr(e, "code", 0)
+                corps = e.read().decode(errors="replace") if code == 429 else ""
+                # passerelle coupée (502 le 27/10 à midi, 504 le 22/10) : UNE seconde tentative après 10 s (Rémi),
+                # puis REPLI OpenRouter (même modèle, data_collection deny) si on est sur Albert
+                if code in (0, 502, 503, 504):
+                    if essai == 0:
+                        time.sleep(10); continue
+                    if LLM == "albert" and not (model and "/" in model):
+                        url, body = _openrouter(body, None)
+                        h["Authorization"] = "Bearer " + open(os.path.expanduser("~/.config/openrouter.key")).read().strip()
+                        etape += f" (repli OpenRouter {OR_MODELE} : Albert HTTP {code})"
+                        r = json.load(urllib.request.urlopen(urllib.request.Request(url, body, h), timeout=3600))
+                        break
+                    raise
                 # quota du JOUR épuisé : inutile d'attendre (la boucle coûtait ~200 s par question, 22/10)
                 if e.code != 429 or essai == 7 or "day" in corps or "jour" in corps:
                     raise
