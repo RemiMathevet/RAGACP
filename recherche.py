@@ -61,19 +61,35 @@ def requetes_pplx(vs):
         return np.asarray(m.encode_queries([[v] for v in vs], normalize_embeddings=True), dtype=np.float32).reshape(len(vs), -1)
 
 
+def documents_pplx(textes):
+    """Vecteurs contextuels des passages d'UN document, dans l'ordre, comme pplx_anapath.index. Le cache rendu après
+    chaque document laisse la carte aux autres jobs."""
+    import pplx_anapath as p, torch
+    m = _pplx()[0]
+    if next(m.parameters()).device.type != "cuda":
+        raise RuntimeError("pplx sur CPU : pas d'indexation (noyaux différents, et trop lent)")
+    E = p.encoder_doc(textes)
+    torch.cuda.empty_cache()
+    return E
+
+
 def servir_encodeur(port, verrou):
-    """POST {"q": [...]} -> {"E": [[...]]} sur 127.0.0.1 seulement (aucun tunnel ne pointe ce port). Client :
+    """POST {"q": [...]} -> {"E": [[...]]} (questions) ou {"doc": [passages]} (un document à indexer), sur 127.0.0.1 seulement (aucun tunnel ne pointe ce port). Client :
     foetodata_hub/api/ask.py, dont la base et l'index restent dans foeto_base (jamais mêlés à l'anapath)."""
     import json
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
     class H(BaseHTTPRequestHandler):
         def do_POST(self):
-            vs = [str(x)[:2000] for x in json.loads(self.rfile.read(int(self.headers["Content-Length"])))["q"][:8]]
-            with verrou:
-                E = requetes_pplx(vs)
-            b = json.dumps({"E": E.tolist()}).encode()
-            self.send_response(200); self.send_header("Content-Type", "application/json")
+            d, code = json.loads(self.rfile.read(int(self.headers["Content-Length"]))), 200
+            try:
+                with verrou:
+                    E = documents_pplx([str(x) for x in d["doc"]]) if "doc" in d else \
+                        requetes_pplx([str(x)[:8000] for x in d["q"][:8]])      # 8 000 : une vignette entière (matrice)
+                b = json.dumps({"E": E.tolist()}).encode()
+            except Exception as e:
+                b, code = json.dumps({"erreur": f"{type(e).__name__}: {e}"}).encode(), 503
+            self.send_response(code); self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
 
         def log_message(self, *a):
